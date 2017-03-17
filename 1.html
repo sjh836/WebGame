@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="삼육대학교 17-1 게임프로그래밍 4B">
+    <meta name="author" content="2012335054 이정훈">
+
+    <title>빨간색 웹게임</title>
+    <!-- phaser 프레임워크 -->
+    <script src="js/phaser.min.js"></script>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+    body {
+        padding-top: 70px;
+    }
+    canvas {
+      margin: 1px auto;
+    }
+
+    </style>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">드랍다운</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">빨간색게임</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="index.html">Home</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Work <b class="caret"></b></a>
+                        <ul class="dropdown-menu dropdown-menu-left">
+                            <li><a href="1.html">3월 17일</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="https://www.facebook.com/sjh836">About</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>3월 17일 금요일</h1>
+            </div>
+        </div>
+        <div class="row">
+          <script type="text/javascript">
+
+          var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+          var platforms;
+          var cursors;
+          var score = 0;
+          var scoreText;
+
+          function preload() {
+              game.load.image('sky', 'assets/sky.png');
+              game.load.image('ground', 'assets/platform.png');
+              game.load.image('star', 'assets/star.png');
+              game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+          }
+
+          function create() {
+            game.physics.startSystem(Phaser.Physics.ARCADE);
+
+            game.add.sprite(0, 0, 'sky');
+
+            platforms = game.add.group();
+
+            platforms.enableBody = true; 
+
+            var ground = platforms.create(0, game.world.height - 64, 'ground'); // 땅만들기
+
+
+            ground.scale.setTo(2, 2);
+
+            ground.body.immovable = true;
+
+            var ledge = platforms.create(400, 400, 'ground'); //첫번째 선반 플랫폼
+
+            ledge.body.immovable = true;
+
+            ledge = platforms.create(-150, 250, 'ground'); //두번째 선반 플랫폼
+
+            ledge.body.immovable = true;
+
+            player = game.add.sprite(32, game.world.height - 300, 'dude'); //플레이어 세팅
+
+            game.physics.arcade.enable(player);
+
+            player.body.bounce.y = 0.2; //유저의 바운스
+            player.body.gravity.y = 300; //유저의 중력
+            player.body.collideWorldBounds = true; //화면을 뚫지 않는다
+
+            player.animations.add('left', [0, 1, 2, 3], 10, true); //10=프레임
+            player.animations.add('right', [5, 6, 7, 8], 10, true);
+
+            cursors = game.input.keyboard.createCursorKeys();
+
+            stars = game.add.group();
+
+                stars.enableBody = true;
+
+                for (var i = 0; i < 12; i++) //별이 12개
+                {
+                    var star = stars.create(i * 70, 0, 'star'); //별그룹 생성, 초기위치
+
+                    star.body.gravity.y = 60; //중력
+
+                    star.body.bounce.y = 0.7 + Math.random() * 0.2; //별의 랜덤 바운스
+                }
+                scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+          }
+
+          function update() {
+            var hitPlatform = game.physics.arcade.collide(player, platforms);
+
+            player.body.velocity.x = 0; //0값으로 초기화하지않으면 움직임
+
+            if (cursors.left.isDown)
+                {
+                    player.body.velocity.x = -150; //왼쪽으로
+
+                    player.animations.play('left');
+                }
+                else if (cursors.right.isDown)
+              {
+                    player.body.velocity.x = 150; //오른쪽으로
+
+                    player.animations.play('right');
+                }
+              else
+                {
+                    player.animations.stop(); //아무 키값없으면 제자리에 서있기
+
+                    player.frame = 4;
+                }
+              if (cursors.up.isDown && player.body.touching.down && hitPlatform) //업 키, 내려가는중일때, 땅에 발이닿을때만 점프 허용
+              {
+                  player.body.velocity.y = -320;
+              }
+
+              game.physics.arcade.collide(stars, platforms);
+              game.physics.arcade.overlap(player, stars, collectStar, null, this); //유저와 별이 충돌할 경우 collectStar함수 호출
+          }
+          function collectStar (player, star) {
+              star.kill(); //유저와 별이 닿으면 별이 사라짐
+              score += 10; //10점 추가
+            
+              if (score==120) //120점 달성할 경우 클리어
+              { 
+                scoreText.text = '1단계 클리어';
+              }
+              else
+              { 
+                scoreText.text = 'Score: ' + score;
+              }
+          }
+          </script>
+        </div>
+        <!-- /.row -->
+        <hr>
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery Version 1.11.1 -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
