@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="삼육대학교 17-1 게임프로그래밍 4B">
+    <meta name="author" content="2012335054 이정훈">
+
+    <title>빨간색 웹게임</title>
+    <!-- phaser 프레임워크 -->
+    <script src="js/phaser.min.js"></script>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+    body {
+        padding-top: 70px;
+    }
+    canvas {
+      margin: 1px auto;
+    }
+
+    </style>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">드랍다운</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">빨간색게임</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="index.html">Home</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Work <b class="caret"></b></a>
+                        <ul class="dropdown-menu dropdown-menu-left">
+                            <li><a href="1.html">튜토리얼</a></li>
+                            <li><a href="2.html">2단점프</a></li>
+                            <li><a href="3.html">블럭 피하기</a></li>
+                            <li><a href="4.html">Flappy Bird</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="https://www.facebook.com/sjh836">About</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>3월 24일 금요일 블럭 피하기</h1>
+            </div>
+        </div>
+        <div class="row">
+          <script type="text/javascript">
+var dead;
+var mainState = {
+    preload: function() { 
+         game.load.image('bird', 'assets/bird/bird.png'); //유저블럭 추가
+         game.load.image('pipe', 'assets/bird/pipe.png');
+         game.load.audio('jump', 'assets/bird/jump.wav'); 
+    },
+
+    create: function() { 
+        dead=false; //죽지 않은 상태 
+
+        game.stage.backgroundColor = '#71c5cf'; //배경색 설정
+
+        game.physics.startSystem(Phaser.Physics.ARCADE); //물리시스템 추가
+
+        this.bird = game.add.sprite(100, 245, 'bird');
+
+        game.physics.arcade.enable(this.bird); //중력 영향받도록 설정
+
+        this.bird.body.gravity.y = 1000; //중력값
+
+        var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        spaceKey.onDown.add(this.jump, this); //점프누르면 함수 호출
+
+        this.pipes = game.add.group(); 
+        this.timer = game.time.events.loop(1500, this.addRowOfPipes, this); //1.5초마다 이벤트 호출
+
+        this.score = 0;
+        this.labelScore = game.add.text(20, 20, "score: 0", { font: "30px Arial", fill: "#ffffff" }); //점수 추가
+
+        this.jumpSound = game.add.audio('jump');  //소리추가
+
+        this.bird.anchor.setTo(-0.2, 0.5); //유저블럭 중심점을 좌표만큼 옮김
+    },
+
+    update: function() {
+        if (this.bird.y < 0 || this.bird.y > 490) //밑이나 위를 뚫고나가면 게임을 재시작한다
+            this.restartGame(); 
+
+        if (this.bird.angle < 20)
+          this.bird.angle += 1; //기울기를 오른쪽으로
+
+        //game.physics.arcade.overlap(this.bird, this.pipes, this.restartGame, null, this); //파이프와 부딪히면 게임재시작
+        game.physics.arcade.overlap(this.bird, this.pipes, this.hitPipe, null, this); //파이프를 쳤을때 hitPipe함수호출
+    },
+
+    jump: function() { //점프
+        if(dead==true) //죽었으면 점프함수 끝내버림
+        {
+          return;
+        }
+        else
+        {
+          this.bird.body.velocity.y = -350;
+          this.jumpSound.play(); //점프할때 소리난다
+
+          //game.add.tween(this.bird).to({angle: -20}, 100).start(); 밑에 코드를 한줄로
+          var animation = game.add.tween(this.bird); //애니메이션 추가
+          animation.to({angle: -20}, 100); //점프할때마다 기울기를 왼쪽으로 20도
+          animation.start(); 
+        }
+    },
+
+    restartGame: function() { //게임 재시작
+        game.state.start('main');
+    },
+
+    addOnePipe: function(x, y) { 
+        var pipe = game.add.sprite(x, y, 'pipe'); //파이프 생성 위치
+
+        this.pipes.add(pipe);
+
+        game.physics.arcade.enable(pipe); //물리법칙에 적용받음
+
+        pipe.body.velocity.x = -150; //파이프의 이동 속도
+
+        pipe.checkWorldBounds = true; 
+        pipe.outOfBoundsKill = true; //파이프가 화면밖으로 나가면 소멸시킴
+    },
+
+    addRowOfPipes: function() {
+        var hole = Math.floor(Math.random() * 5) + 1; //1~5위치에서 랜덤하게 구멍을 하나 만들어준다
+
+        for (var i = 0; i < 8; i++)
+            if (i != hole && i != hole + 1)  //hole및 hole+1에 구멍을 낸다
+                this.addOnePipe(400, i * 60 + 10);   
+
+        this.score += 3; //3점 추가
+        this.labelScore.text = "score: "+this.score;  
+    },
+
+    hitPipe: function() {
+        dead=true; //죽어서 점프 불능
+
+        if (this.bird.alive == false) //새는 아무것도하지못하고 떨어진다
+            return;
+
+        this.bird.alive = false; //죽은상태로 바꿔줌
+
+        game.time.events.remove(this.timer); //새로운 파이프가 나타나지 않음
+
+        this.pipes.forEach(function(p) {p.body.velocity.x = 0;}, this); //hit하면 모든 이동0
+    }, 
+};
+
+var game = new Phaser.Game(400, 490); //게임 생성
+
+game.state.add('main', mainState); 
+
+game.state.start('main');
+          </script>
+        </div>
+        <!-- /.row -->
+        <hr>
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery Version 1.11.1 -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
