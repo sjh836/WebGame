@@ -58,8 +58,10 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Work <b class="caret"></b></a>
                         <ul class="dropdown-menu dropdown-menu-left">
-                            <li><a href="1.html">3월 17일</a></li>
-                            <li><a href="1.html">3월 24일</a></li>
+                            <li><a href="1.html">튜토리얼</a></li>
+                            <li><a href="2.html">2단점프</a></li>
+                            <li><a href="3.html">블럭 피하기</a></li>
+                            <li><a href="4.html">Flappy Bird</a></li>
                         </ul>
                     </li>
                     <li>
@@ -77,127 +79,182 @@
 
         <div class="row">
             <div class="col-lg-12 text-center">
-                <h1>3월 24일 금요일</h1>
+                <h1>2단점프 구현 과제</h1>
             </div>
         </div>
         <div class="row">
           <script type="text/javascript">
 
-          var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-          var platforms;
-          var cursors;
-          var score = 0;
-          var scoreText;
-          var dash=0; //이단점프
+var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var platforms;
+var cursors;
+var score = 0;
+var scoreText;
 
-          function preload() {
-              game.load.image('sky', 'assets/sky.png');
-              game.load.image('ground', 'assets/platform.png');
-              game.load.image('star', 'assets/star.png');
-              game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
-          }
+function preload() {
+    game.load.image('sky', 'assets/tutorial/sky.png');
+    game.load.image('ground', 'assets/tutorial/platform.png');
+    game.load.image('star', 'assets/tutorial/star.png');
+    game.load.image('diamond', 'assets/tutorial/diamond.png');
+    game.load.spritesheet('dude', 'assets/tutorial/dude.png', 32, 48);
+}
 
-          function create() {
-            game.physics.startSystem(Phaser.Physics.ARCADE);
+function create() {
+  game.physics.startSystem(Phaser.Physics.ARCADE);
 
-            game.add.sprite(0, 0, 'sky');
+  game.add.sprite(0, 0, 'sky');
 
-            platforms = game.add.group();
+  platforms = game.add.group();
 
-            platforms.enableBody = true; 
+  platforms.enableBody = true; 
 
-            var ground = platforms.create(0, game.world.height - 64, 'ground'); // 땅만들기
+  var ground = platforms.create(0, game.world.height - 64, 'ground'); // 땅만들기
 
 
-            ground.scale.setTo(2, 2);
+  ground.scale.setTo(2, 2);
 
-            ground.body.immovable = true;
+  ground.body.immovable = true;
 
-            var ledge = platforms.create(400, 400, 'ground'); //첫번째 선반 플랫폼
+  var ledge = platforms.create(400, 400, 'ground'); //첫번째 선반 플랫폼
 
-            ledge.body.immovable = true;
+  ledge.body.immovable = true;
 
-            ledge = platforms.create(-150, 250, 'ground'); //두번째 선반 플랫폼
+  ledge = platforms.create(-150, 250, 'ground'); //두번째 선반 플랫폼
 
-            ledge.body.immovable = true;
+  ledge.body.immovable = true;
 
-            player = game.add.sprite(32, game.world.height - 300, 'dude'); //플레이어 세팅
+  ledge = platforms.create(600, 150, 'ground'); //세번째 선반 플랫폼
 
-            game.physics.arcade.enable(player);
+  ledge.body.immovable = true;
 
-            player.body.bounce.y = 0.2; //유저의 바운스
-            player.body.gravity.y = 300; //유저의 중력
-            player.body.collideWorldBounds = true; //화면을 뚫지 않는다
+  player = game.add.sprite(32, game.world.height - 300, 'dude'); //플레이어 세팅
 
-            player.animations.add('left', [0, 1, 2, 3], 10, true); //10=프레임
-            player.animations.add('right', [5, 6, 7, 8], 10, true);
+  game.physics.arcade.enable(player);
 
-            cursors = game.input.keyboard.createCursorKeys();
+  player.body.bounce.y = 0.2; //유저의 바운스
+  player.body.gravity.y = 300; //유저의 중력
+  player.body.collideWorldBounds = true; //화면을 뚫지 않는다
 
-            stars = game.add.group();
+  player.animations.add('left', [0, 1, 2, 3], 10, true); //10=프레임
+  player.animations.add('right', [5, 6, 7, 8], 10, true);
 
-                stars.enableBody = true;
+  cursors = game.input.keyboard.createCursorKeys();
 
-                for (var i = 0; i < 12; i++) //별이 12개
-                {
-                    var star = stars.create(i * 70, 0, 'star'); //별그룹 생성, 초기위치
+  stars = game.add.group();
+  stars.enableBody = true;
+  diamonds = game.add.group();
+  diamonds.enableBody = true;
 
-                    star.body.gravity.y = 60; //중력
+  for (var i = 0; i < 12; i++) //12개 아이템
+  {
+    if(i%3==1)
+    {
+      var diamond = diamonds.create(i * 70, 0, 'diamond'); //다이아몬드그룹 생성, 초기위치
+      diamond.body.gravity.y = 50; //중력
+      diamond.body.bounce.y = 0.7 + Math.random() * 0.3; //다이아몬드의 랜덤 바운스
+    }
+    else
+    {
+      var star = stars.create(i * 70, 0, 'star'); //별그룹 생성, 초기위치
+      star.body.gravity.y = 60; //중력
+      star.body.bounce.y = 0.5 + Math.random() * 0.2; //별의 랜덤 바운스
+    }
+  }
 
-                    star.body.bounce.y = 0.7 + Math.random() * 0.2; //별의 랜덤 바운스
-                }
-                scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-          }
+  scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+}
 
-          function update() {
-            var hitPlatform = game.physics.arcade.collide(player, platforms);
+function update() {
+  var hitPlatform = game.physics.arcade.collide(player, platforms);
 
-            player.body.velocity.x = 0; //0값으로 초기화하지않으면 움직임
+  player.body.velocity.x = 0; //0값으로 초기화하지않으면 움직임
 
-              if (cursors.left.isDown)
-                {
-                    player.body.velocity.x = -150; //왼쪽으로
+  if (cursors.left.isDown)
+  {
+      player.body.velocity.x = -150; //왼쪽으로
 
-                    player.animations.play('left');
-                }
-                else if (cursors.right.isDown)
-              {
-                    player.body.velocity.x = 150; //오른쪽으로
+      player.animations.play('left');
+  }
+  else if (cursors.right.isDown)
+  {
+      player.body.velocity.x = 150; //오른쪽으로
 
-                    player.animations.play('right');
-                }
-              else
-                {
-                    player.animations.stop(); //아무 키값없으면 제자리에 서있기
+      player.animations.play('right');
+  }
+  else
+  {
+      player.animations.stop(); //아무 키값없으면 제자리에 서있기
 
-                    player.frame = 4;
-                }
-              if (cursors.up.isDown && player.body.touching.down && hitPlatform) //업 키, 내려가는중일때, 땅에 발이닿을때만 점프 허용
-              {
-                  player.body.velocity.y = -200;
-                  dash=1;
-              }
-               if (dash&&cursors.down.isDown)
-                {
-                  player.body.velocity.y = -300;
-                  dash=0;
-                }
-              game.physics.arcade.collide(stars, platforms);
-              game.physics.arcade.overlap(player, stars, collectStar, null, this); //유저와 별이 충돌할 경우 collectStar함수 호출
-          }
-          function collectStar (player, star) {
-              star.kill(); //유저와 별이 닿으면 별이 사라짐
-              score += 10; //10점 추가
-            
-              if (score==120) //120점 달성할 경우 클리어
-              { 
-                scoreText.text = '1단계 클리어';
-              }
-              else
-              { 
-                scoreText.text = 'Score: ' + score;
-              }
-          }
+      player.frame = 4;
+  }
+
+  var onTheGround = player.body.touching.down; //내려가면서 땅에 닿았을때
+
+  if (onTheGround) {
+      this.jumps = 2; //2번 점프할 수 있게 초기화
+      this.jumping = false;
+  }
+
+  if (this.jumps > 0 && upInputIsActive(5)) {
+      player.body.velocity.y = -250;
+      this.jumping = true;
+  }
+
+  if (this.jumping && upInputReleased()) { //점프중이고 입력이 해제되면 점프가능숫자를 줄이고 점프금지
+      this.jumps--;
+      this.jumping = false;
+  }
+
+  game.physics.arcade.collide(stars, platforms);
+  game.physics.arcade.overlap(player, stars, collectStar, null, this); //유저와 별이 충돌할 경우 collectStar함수 호출
+  game.physics.arcade.collide(diamonds, platforms);
+  game.physics.arcade.overlap(player, diamonds, collectDiamond, null, this); //유저와 별이 충돌할 경우 collectStar함수 호출
+}
+
+function collectStar (player, star) {
+    star.kill(); //유저와 별이 닿으면 별이 사라짐
+    score += 10; //10점 추가
+  
+    clear();
+}
+
+function collectDiamond (player, diamond) {
+    diamond.kill();
+    score += 25; //25점 추가
+  
+    clear();
+}
+
+function clear () {
+    if (score==180) //180점 달성할 경우 클리어
+    { 
+      scoreText.text = '2단계 클리어';
+    }
+    else
+    { 
+      scoreText.text = 'Score: ' + score;
+    }
+}
+
+function upInputIsActive (duration) { //점프 시 true 반환, 점프방법은 윗키나 화면터치
+    var isActive = false;
+
+    isActive = game.input.keyboard.downDuration(Phaser.Keyboard.UP, duration);
+    isActive |= (this.game.input.activePointer.justPressed(duration + 1000/60) &&
+        this.game.input.activePointer.x > this.game.width/4 &&
+        this.game.input.activePointer.x < this.game.width/2 + this.game.width/4);
+
+    return isActive;
+}
+
+function upInputReleased () { //점프 버튼 해제시 true 반환
+    var released = false;
+
+    released = game.input.keyboard.upDuration(Phaser.Keyboard.UP);
+    released |= this.game.input.activePointer.justReleased();
+
+    return released;
+}
           </script>
         </div>
         <!-- /.row -->
