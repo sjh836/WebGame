@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="삼육대학교 17-1 게임프로그래밍 4B">
+    <meta name="author" content="2012335054 이정훈">
+
+    <title>빨간색 웹게임</title>
+    <!-- phaser 프레임워크 -->
+    <script src="js/phaser.min.js"></script>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+    body {
+        padding-top: 70px;
+    }
+    canvas {
+      margin: 1px auto;
+    }
+
+    </style>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">드랍다운</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">빨간색게임</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="index.html">Home</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Work <b class="caret"></b></a>
+                        <ul class="dropdown-menu dropdown-menu-left">
+                            <li><a href="1.html">튜토리얼</a></li>
+                            <li><a href="2.html">2단점프</a></li>
+                            <li><a href="3.html">블럭 피하기</a></li>
+                            <li><a href="4.html">Flappy Bird</a></li>
+                            <li><a href="5.html">벽돌깨기</a></li>
+                            <li><a href="6.html">2D플랫폼</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="https://www.facebook.com/sjh836">About</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>벽돌깨기</h1>
+                <h6>spacebar : 총알 발사, getStar : 총알 장전</h6>
+            </div>
+        </div>
+        <div class="row">
+          <script type="text/javascript">
+var mainState = {  
+    preload: function() {  
+        game.load.image('background', 'assets/breakout/background.png');
+        game.load.image('paddle', 'assets/breakout/paddle.png');
+        game.load.image('redBrick', 'assets/breakout/redBrick.png');
+        game.load.image('blueBrick', 'assets/breakout/blueBrick.png'); 
+        game.load.image('yellowBrick', 'assets/breakout/yellowBrick.png'); 
+        game.load.image('greenBrick', 'assets/breakout/greenBrick.png'); 
+        game.load.image('ball', 'assets/breakout/ball.png');
+        game.load.image('bullet', 'assets/breakout/bullet.png');
+        game.load.audio('hit', 'assets/bird/jump.wav'); 
+        game.load.image('star', 'assets/tutorial/star.png');
+        game.load.image('diamond', 'assets/tutorial/diamond.png');
+    },
+
+    create: function() {  
+        game.add.sprite(0, 0, 'background'); //배경화면
+        game.physics.startSystem(Phaser.Physics.ARCADE); //물리시스템 작동
+
+        game.world.enableBody = true; //모든 객체에 물리엔진 적용
+
+        this.left = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+        this.right = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+
+        this.paddle = game.add.sprite(250, 400, 'paddle'); //패들 생성
+
+        this.paddle.body.immovable = true; //공과 패들이 충돌해도 밀리지 않는다
+
+        this.paddle.body.collideWorldBounds=true; //배경밖을 벗어나지 않는다
+
+        this.bricks = game.add.group(); //그룹 생성
+        this.stars = game.add.group(); 
+        this.diamonds = game.add.group();
+        this.bullets = game.add.group();
+
+        for (var i = 0; i < 6; i++) {
+            for (var j = 0; j < 8; j++) { //6 X 8 벽돌생성
+                var random=Math.floor(Math.random() * 4); //4가지 벽돌 중 랜덤생성
+                switch(random) {
+                    case 0:
+                    this.createBrick(50+i*50, 25+j*25, 'redBrick');
+                    break;
+                    case 1:
+                    this.createBrick(50+i*50, 25+j*25, 'yellowBrick');
+                    break;
+                    case 2:
+                    this.createBrick(50+i*50, 25+j*25, 'greenBrick');
+                    break;
+                    case 3:
+                    this.createBrick(50+i*50, 25+j*25, 'blueBrick');
+                    break;
+                }
+            }
+        }
+
+        this.ball = game.add.sprite(200, 300, 'ball'); //볼생성
+
+        this.ball.body.velocity.x = 200; //볼 스피드
+        this.ball.body.velocity.y = 200;
+
+        this.ball.body.bounce.setTo(1.011); //공이 튀긴다, 점차 가속됨
+        this.ball.body.collideWorldBounds = true; //볼이 게임 밖으로 나가지 않음
+
+        this.score = 0;
+        this.labelScore = game.add.text(20, 20, "score: 0", { font: "30px Arial", fill: "#ffffff" }); //점수 추가
+
+        this.bulletCount = 3;
+        this.labelBullet = game.add.text(20, 400, "bullet: 3", { font: "30px Arial", fill: "#ffffff" }); //총알판 추가
+
+        this.hitSound = game.add.audio('hit');  //소리추가
+    },
+
+    update: function() {  
+        this.spacebar = game.input.keyboard.downDuration(Phaser.Keyboard.SPACEBAR, 15);
+        if (this.left.isDown) this.paddle.body.velocity.x = -300; //좌우 이동
+        else if (this.right.isDown) this.paddle.body.velocity.x = 300;
+        else this.paddle.body.velocity.x = 0;  //키를 누르지않으면 패들은 움직이지 않음
+
+        if(this.spacebar&&this.bulletCount>0) this.shot(35+this.paddle.x, this.paddle.y);
+
+        game.physics.arcade.collide(this.paddle, this.ball); //볼과 패들은 서로 충돌함
+
+        game.physics.arcade.collide(this.ball, this.bricks, this.hit, null, this); //볼과 벽돌이 충돌할 때 호출
+        game.physics.arcade.collide(this.bullets, this.bricks, this.hitShot, null, this); //총알과 벽돌이 충돌할 때 호출
+
+        game.physics.arcade.collide(this.paddle, this.stars, this.getStar, null, this); //패들과 아이템이 충돌할 때 호출
+        game.physics.arcade.collide(this.paddle, this.diamonds, this.getDiamond, null, this); //패들과 아이템이 충돌할 때 호출
+
+        if (this.ball.y > this.paddle.y) //볼이 패들 밑에있을 경우 게임을 재시작
+            game.state.start('main');  
+    },
+
+    hit: function(ball, brick) {  
+        this.hitSound.play(); //벽돌깰때 소리난다
+        brick.kill();
+
+        this.score += 10; //10점 추가
+        this.labelScore.text = "score: "+this.score;
+        if(Math.floor(Math.random() * 10)<4) //30%의 확률로 아이템이 떨어짐
+        {
+            this.star = game.add.sprite(15+brick.x, brick.y, 'star');
+            this.star.body.gravity.y = 300;
+
+            this.star.body.immovable = true;
+            this.star.outOfBoundsKill = true;
+            this.stars.add(this.star);
+        }
+        else if(Math.floor(Math.random() * 10)<2) //10%의 확률로 아이템이 떨어짐
+        {
+            this.diamond = game.add.sprite(brick.x, brick.y, 'diamond');
+            this.diamond.body.gravity.y = 300;
+
+            this.diamond.body.immovable = true;
+            this.diamond.outOfBoundsKill = true;
+            this.diamonds.add(this.diamond);
+        }
+    },
+    hitShot: function(bullet, brick) {  
+        this.hitSound.play(); //벽돌깰때 소리난다
+        brick.kill();
+        bullet.kill();
+
+        this.score += 10; //10점 추가
+        this.labelScore.text = "score: "+this.score;
+
+        if(Math.floor(Math.random() * 10)<2) //10%의 확률로 아이템이 떨어짐
+        {
+            this.diamond = game.add.sprite(brick.x, brick.y, 'diamond');
+            this.diamond.body.gravity.y = 300;
+
+            this.diamond.body.immovable = true;
+            this.diamond.outOfBoundsKill = true;
+            this.diamonds.add(this.diamond);
+        }
+    },
+    getStar: function(paddle, star) {
+        star.kill();
+        this.bulletCount++; //총알추가
+        this.labelBullet.text = "bullet: "+this.bulletCount;  
+    },
+    getDiamond: function(paddle, diamond) {
+        diamond.kill();
+        this.score += 100; //100점 추가
+        this.labelScore.text = "score: "+this.score;  
+    },
+    createBrick: function(x, y, brickType) {
+        var brick = game.add.sprite(x, y, brickType);
+
+        brick.body.immovable = true;
+
+        this.bricks.add(brick);
+    },
+    shot: function(x, y) {
+        var bullet = game.add.sprite(x, y, 'bullet');
+
+        bullet.body.immovable = true;
+        bullet.enableBody = true;
+
+        bullet.body.velocity.y = -300;
+        bullet.outOfBoundsKill = true;
+
+        this.bullets.add(bullet);
+
+        this.bulletCount--; //총알소모
+        this.labelBullet.text = "bullet: "+this.bulletCount;  
+    },
+};
+
+var game = new Phaser.Game(400, 450);  
+game.state.add('main', mainState);  
+game.state.start('main');
+
+          </script>
+        </div>
+        <!-- /.row -->
+        <hr>
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery Version 1.11.1 -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
