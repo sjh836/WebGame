@@ -48,7 +48,8 @@
         <div class="row">
             <div class="col-lg-12 text-center">
                 <h1>벽돌깨기</h1>
-                <h6>spacebar : 총알 발사, getStar : 총알 장전</h6>
+                <h6>spacebar : 총알 발사, getStar : 총알 장전, Spacebar: 빵야</h6>
+                <h6>모바일터치 지원, paddle왼쪽: ←, 오른쪽:→, 총알은 좌우터치</h6>
             </div>
         </div>
         <div class="row">
@@ -127,11 +128,16 @@ var mainState = {
 
     update: function() {  
         this.spacebar = game.input.keyboard.downDuration(Phaser.Keyboard.SPACEBAR, 15);
-        if (this.left.isDown) this.paddle.body.velocity.x = -300; //좌우 이동
-        else if (this.right.isDown) this.paddle.body.velocity.x = 300;
+        if (this.left.isDown) this.paddle.body.velocity.x = -350; //좌우 이동
+        else if (this.right.isDown) this.paddle.body.velocity.x = 350;
         else this.paddle.body.velocity.x = 0;  //키를 누르지않으면 패들은 움직이지 않음
 
         if(this.spacebar&&this.bulletCount>0) this.shot(35+this.paddle.x, this.paddle.y);
+
+        //모바일 터치 부분
+        if(this.input.activePointer.isDown&&this.input.activePointer.y> this.game.height/2&&this.input.activePointer.x<this.paddle.x&&this.physics.arcade.distanceToPointer(this.paddle) > 30) this.paddle.body.velocity.x = -350;
+        else if(this.input.activePointer.isDown&&this.input.activePointer.y>this.game.height/2&&this.input.activePointer.x>this.paddle.x&&this.physics.arcade.distanceToPointer(this.paddle)>30) this.paddle.body.velocity.x = 350;
+        if(this.input.activePointer.justPressed(20)&&this.bulletCount>0) this.shot(35+this.paddle.x, this.paddle.y);
 
         game.physics.arcade.collide(this.paddle, this.ball); //볼과 패들은 서로 충돌함
 

@@ -10,7 +10,7 @@ function includeHTML() {
         if (this.readyState == 4 && this.status == 200) {
           elmnt.innerHTML = this.responseText;
           elmnt.removeAttribute("include-html");
-          w3IncludeHTML();
+          includeHTML();
         }
       }      
       xhttp.open("GET", file, true);
