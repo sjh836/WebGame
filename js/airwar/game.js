@@ -44,6 +44,24 @@ BasicGame.Game.prototype = {
  		life.anchor.setTo(0.5, 0.5); 
  	}
 
+	//영웅필살 관련
+ 	this.bombs = this.add.group(); 
+ 	var firstBombIconX = this.game.width - 790 + (BasicGame.PLAYER_EXTRA_BOMBS * 30); 
+ 	for (var i = 0; i < BasicGame.PLAYER_EXTRA_BOMBS; i++) { 
+ 		var bomb = this.bombs.create(firstBombIconX - (30 * i), 30, 'bomb');
+ 		bomb.anchor.setTo(0.5, 0.5); 
+ 	}
+
+	//영웅 관련
+	this.heroPool = this.add.group();
+	this.heroPool.enableBody = true;
+	this.heroPool.physicsBodyType = Phaser.Physics.ARCADE;
+	this.heroPool.createMultiple(1, 'hero');
+	this.heroPool.setAll('anchor.x', 0.5);
+	this.heroPool.setAll('anchor.y', 0.5);
+	this.heroPool.setAll('outOfBoundsKill', true); 
+	this.heroPool.setAll('checkWorldBounds', true);
+
  	//아이템 관련
  	this.powerUpPool = this.add.group();
  	this.powerUpPool.enableBody = true;
@@ -222,6 +240,11 @@ BasicGame.Game.prototype = {
 	this.physics.arcade.overlap(this.player, this.bossPool, this.playerHit, null, this);
 	this.physics.arcade.overlap(this.bulletPool, this.destroyerPool, this.enemyHit, null, this);
 	this.physics.arcade.overlap(this.player, this.destroyerPool, this.playerHit, null, this);
+	this.physics.arcade.overlap(this.heroPool, this.enemyBulletPool, this.heroHit, null, this);
+	this.physics.arcade.overlap(this.heroPool, this.bossPool, this.heroHit, null, this);
+	this.physics.arcade.overlap(this.heroPool, this.shooterPool, this.heroHit, null, this);
+	this.physics.arcade.overlap(this.heroPool, this.enemyPool, this.heroHit, null, this);
+	this.physics.arcade.overlap(this.heroPool, this.destroyerPool, this.heroHit, null, this);
 
 	//적기 생성
 	if(this.nextEnemyAt < this.time.now && this.enemyPool.countDead() > 0) {
@@ -322,6 +345,14 @@ BasicGame.Game.prototype = {
 			this.fire();
 		}
 	}
+	if(this.input.keyboard.isDown(Phaser.Keyboard.B)) { //B키를 누르면 bomb 함수 호출
+		if(this.returnText && this.returnText.exists) { 
+			this.quitGame();
+		}
+		else {
+			this.bomb();
+		}
+	}
 	if(this.instructions.exists && this.time.now > this.instExpire) {
 		this.instructions.destroy(); //안내문구 사라진다
 	}
@@ -351,7 +382,6 @@ BasicGame.Game.prototype = {
 
 	bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;
 
-	var bullet;
 	if(this.weaponLevel === 0) {
 		if(this.bulletPool.countDead() === 0) {
 			return;
@@ -366,15 +396,36 @@ BasicGame.Game.prototype = {
 		}
 		for(var i = 0; i < this.weaponLevel; i++) { //무기레벨업
 			bullet = this.bulletPool.getFirstExists(false); 
-			bullet.reset(this.player.x - (10 + i * 6), this.player.y - 20); 
-			this.physics.arcade.velocityFromAngle(-95 - i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity);
+			bullet.reset(this.player.x - (10 + i * 8), this.player.y - 20); 
+			//this.physics.arcade.velocityFromAngle(-95 - i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity); //총알 휘어나감
+			bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;
 			bullet = this.bulletPool.getFirstExists(false); 
-			bullet.reset(this.player.x + (10 + i * 6), this.player.y - 20);
-			this.physics.arcade.velocityFromAngle(-85 + i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity);
+			bullet.reset(this.player.x + (10 + i * 8), this.player.y - 20);
+			//this.physics.arcade.velocityFromAngle(-85 + i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity);
+			bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;
 		}
 	}
  },
-  
+
+ bomb: function () {
+	if(!this.player.alive) { //생존중일때 폭탄 발사
+		return;
+	}
+	if(this.heroPool.countDead() === 0) {
+		return;
+	}
+	var bomb = this.bombs.getFirstAlive();
+	if (bomb !== null) { 
+		bomb.kill();
+		this.nextShotAt = this.time.now + this.shotDelay;
+		this.playerFireSFX.play();
+
+		var hero = this.heroPool.getFirstExists(false); //영웅을 생성
+		hero.reset(this.player.x, this.player.y - 20);
+		hero.body.velocity.y = -50;
+	}
+ },
+
  enemyHit: function (bullet, enemy) {
 	bullet.kill();
 	this.damageEnemy(enemy, BasicGame.BULLET_DAMAGE);
@@ -393,12 +444,31 @@ BasicGame.Game.prototype = {
 		this.weaponLevel = 0; //무기레벨을 0으로 초기화
 		this.ghostUntil = this.time.now + BasicGame.PLAYER_GHOST_TIME;
 		this.player.play('ghost');
+
+		this.bombs.destroy();
+		this.bombs = this.add.group(); 
+		var firstBombIconX = this.game.width - 790 + (BasicGame.PLAYER_EXTRA_BOMBS * 30); //폭탄 재생
+	 	for (var i = 0; i < BasicGame.PLAYER_EXTRA_BOMBS; i++) { 
+	 		var bomb = this.bombs.create(firstBombIconX - (30 * i), 30, 'bomb');
+	 		bomb.anchor.setTo(0.5, 0.5); 
+	 	}
 	}
 	else {
 		this.explode(player);
 		player.kill();
 		this.displayEnd(false);
 	}
+ },
+
+ heroHit: function (hero, enemy) { //영웅과 충돌시 모두사망
+ 	enemy.kill();
+
+ 	this.explode(enemy);
+ 	this.explosionSFX.play(); 
+ 	this.spawnPowerUp(enemy);
+ 	this.spawnStar(enemy);
+ 	this.spawnDiamond(enemy);
+ 	this.addToScore(enemy.reward);
  },
 
  damageEnemy: function (enemy, damage) { 
@@ -535,6 +605,7 @@ BasicGame.Game.prototype = {
 	this.diamondPool.destroy();
 	this.bossPool.destroy();
 	this.destroyerPool.destroy();
+	this.heroPool.destroy();
 	this.state.start('MainMenu');
   }
 };

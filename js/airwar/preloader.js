@@ -17,8 +17,10 @@ BasicGame.Preloader.prototype = {
     this.load.image('bullet', 'assets/airwar/bullet.png');
     this.load.image('enemyBullet', 'assets/airwar/enemy-bullet.png');
     this.load.image('powerup1', 'assets/airwar/powerup1.png');
+    this.load.image('bomb', 'assets/airwar/bomb.png');
     this.load.image('star', 'assets/tutorial/star.png');
     this.load.image('diamond', 'assets/tutorial/diamond.png');
+    this.load.image('hero', 'assets/airwar/hero.png');
     this.load.spritesheet('greenEnemy', 'assets/airwar/enemy.png', 32, 32);
     this.load.spritesheet('whiteEnemy', 'assets/airwar/shooting-enemy.png', 32, 32);
     this.load.spritesheet('boss', 'assets/airwar/boss.png', 93, 75);

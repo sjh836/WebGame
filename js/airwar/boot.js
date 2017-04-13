@@ -45,6 +45,7 @@ var BasicGame = { //기호상수들
   BOSS_DROP_RATE: 0.7,
 
   PLAYER_EXTRA_LIVES: 3,
+  PLAYER_EXTRA_BOMBS: 3,
   PLAYER_GHOST_TIME: Phaser.Timer.SECOND * 3,
 
   INSTRUCTION_EXPIRE: Phaser.Timer.SECOND * 10,
