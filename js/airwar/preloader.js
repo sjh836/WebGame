@@ -27,6 +27,8 @@ BasicGame.Preloader.prototype = {
     this.load.spritesheet('explosion', 'assets/airwar/explosion.png', 32, 32);
     this.load.spritesheet('player', 'assets/airwar/player.png', 64, 64);
     this.load.spritesheet('destroyer', 'assets/airwar/destroyer.png', 32, 174);
+    this.load.spritesheet('f01', 'assets/airwar/f01.png', 66, 66);
+    this.load.spritesheet('f02', 'assets/airwar/f02.png', 166, 124);
     this.load.audio('explosion', ['assets/airwar/explosion.ogg', 'assets/airwar/explosion.wav']);
     this.load.audio('playerExplosion', ['assets/airwar/player-explosion.ogg', 'assets/airwar/player-explosion.wav']);
     this.load.audio('enemyFire', ['assets/airwar/enemy-fire.ogg', 'assets/airwar/enemy-fire.wav']);

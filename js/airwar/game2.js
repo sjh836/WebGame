@@ -1,5 +1,5 @@
 
-BasicGame.Game = function (game) {
+BasicGame.Game2 = function (game) {
 	this.game; // a reference to the currently running game
 	this.add; // used to add sprites, text, groups, etc
 	this.camera; // a reference to the game camera
@@ -18,10 +18,9 @@ BasicGame.Game = function (game) {
 	this.rnd; // the repeatable random number generator
 };
 
-BasicGame.Game.prototype = {
+BasicGame.Game2.prototype = {
   create: function () {
 	this.sea = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'sea');
- 	//this.sea.autoScroll(0, BasicGame.SEA_SCROLL_SPEED); 
 
 	//플레이어 관련
 	this.player = this.add.sprite(this.game.width / 2, this.game.height - 50, 'player');	//플레이어 생성 및 가운데 기준으로 생성
@@ -97,17 +96,17 @@ BasicGame.Game.prototype = {
 	this.enemyPool = this.add.group();
 	this.enemyPool.enableBody = true;
 	this.enemyPool.physicsBodyType = Phaser.Physics.ARCADE;
-	this.enemyPool.createMultiple(50, 'greenEnemy');
+	this.enemyPool.createMultiple(50, 'f01');
 	this.enemyPool.setAll('anchor.x', 0.5);
 	this.enemyPool.setAll('anchor.y', 0.5);
 	this.enemyPool.setAll('outOfBoundsKill', true); 
 	this.enemyPool.setAll('checkWorldBounds', true);
-	this.enemyPool.setAll('reward', BasicGame.ENEMY_REWARD, false, false, 0, true); //점수 지급 
+	this.enemyPool.setAll('reward', BasicGame.F01_REWARD, false, false, 0, true); //점수 지급 
 	this.enemyPool.setAll('dropRate', BasicGame.ENEMY_DROP_RATE, false, false, 0, true ); //아이템 드랍율
 
 	this.enemyPool.forEach(function (enemy) {
-		enemy.animations.add('fly', [ 0, 1, 2 ], 20, true);
-		enemy.animations.add('hit', [ 3, 1, 3, 2 ], 20, false); 
+		enemy.animations.add('fly', [ 0 ], 20, true);
+		enemy.animations.add('hit', [ 1, 0 ], 20, false); 
 		enemy.events.onAnimationComplete.add( function (e) { e.play('fly'); }, this); 
 	});
 	this.nextEnemyAt = 0;
@@ -117,16 +116,16 @@ BasicGame.Game.prototype = {
 	this.shooterPool = this.add.group();
 	this.shooterPool.enableBody = true;
 	this.shooterPool.physicsBodyType = Phaser.Physics.ARCADE;
-	this.shooterPool.createMultiple(20, 'whiteEnemy');
+	this.shooterPool.createMultiple(20, 'f02');
 	this.shooterPool.setAll('anchor.x', 0.5);
 	this.shooterPool.setAll('anchor.y', 0.5);
 	this.shooterPool.setAll('outOfBoundsKill', true);
 	this.shooterPool.setAll('checkWorldBounds', true);
-	this.shooterPool.setAll( 'reward', BasicGame.SHOOTER_REWARD, false, false, 0, true );
+	this.shooterPool.setAll( 'reward', BasicGame.F02_REWARD, false, false, 0, true );
 
 	this.shooterPool.forEach(function (enemy) { 
-		enemy.animations.add('fly', [ 0, 1, 2 ], 20, true);
-		enemy.animations.add('hit', [ 3, 1, 3, 2 ], 20, false);
+		enemy.animations.add('fly', [ 0 ], 20, true);
+		enemy.animations.add('hit', [ 1, 0 ], 20, false);
 		enemy.events.onAnimationComplete.add( function (e) { e.play('fly'); }, this);
 	});
 
@@ -220,7 +219,7 @@ BasicGame.Game.prototype = {
 	this.instructions.anchor.setTo(0.5, 0.5);
 	this.instExpire = this.time.now + BasicGame.INSTRUCTION_EXPIRE; //안내문구 10초간 생성
 
-	this.score = 0;
+	this.score = 50000;
 	this.scoreText = this.add.text(this.game.width / 2, 30, '' + this.score, {font: '30px Arial', fill: '#fff', align: 'center'});
 	this.scoreText.anchor.setTo(0.5, 0.5);
 },
@@ -250,7 +249,7 @@ BasicGame.Game.prototype = {
 	if(this.nextEnemyAt < this.time.now && this.enemyPool.countDead() > 0) {
 		this.nextEnemyAt = this.time.now + this.enemyDelay;
 		var enemy = this.enemyPool.getFirstExists(false);
-		enemy.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, BasicGame.ENEMY_HEALTH); //Math.random()을 쓰지않고 게임에 내장된 rnd를 이용, 5방맞아야 죽는듯
+		enemy.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, BasicGame.F01_HEALTH); //Math.random()을 쓰지않고 게임에 내장된 rnd를 이용, 5방맞아야 죽는듯
 		enemy.body.velocity.y = this.rnd.integerInRange(BasicGame.ENEMY_MIN_Y_VELOCITY, BasicGame.ENEMY_MAX_Y_VELOCITY);
 		enemy.play('fly');
 	}
@@ -259,7 +258,7 @@ BasicGame.Game.prototype = {
 	if(this.nextShooterAt < this.time.now && this.shooterPool.countDead() > 0) {
 		this.nextShooterAt = this.time.now + this.shooterDelay;
 		var shooter = this.shooterPool.getFirstExists(false);
-		shooter.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, BasicGame.SHOOTER_HEALTH);
+		shooter.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, BasicGame.F02_HEALTH);
 		var target = this.rnd.integerInRange(20, this.game.width - 20);
 		shooter.rotation = this.physics.arcade.moveToXY(shooter, target, this.game.height, this.rnd.integerInRange(BasicGame.SHOOTER_MIN_VELOCITY, BasicGame.SHOOTER_MAX_VELOCITY)) - Math.PI / 2;
 		shooter.play('fly');
@@ -502,7 +501,7 @@ BasicGame.Game.prototype = {
  addToScore: function (score) {
  	this.score += score;
  	this.scoreText.text = this.score; 224
-	if(this.score >= 1000) {
+	if(this.score >= 150000) {
 		this.enemyPool.destroy();
 		this.shooterPool.destroy();
 		this.enemyBulletPool.destroy();
@@ -606,7 +605,6 @@ BasicGame.Game.prototype = {
 	this.bossPool.destroy();
 	this.destroyerPool.destroy();
 	this.heroPool.destroy();
-	//this.state.start('MainMenu'); //메인화면으로
-	this.state.start('Game2'); //2탄으로
+	this.state.start('MainMenu');
   }
 };
