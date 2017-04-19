@@ -174,7 +174,7 @@ BasicGame.Game2.prototype = {
 	this.enemyBulletPool = this.add.group();
 	this.enemyBulletPool.enableBody = true;
 	this.enemyBulletPool.physicsBodyType = Phaser.Physics.ARCADE;
-	this.enemyBulletPool.createMultiple(100, 'enemyBullet');
+	this.enemyBulletPool.createMultiple(100, 'enemyBullet2');
 	this.enemyBulletPool.setAll('anchor.x', 0.5);
 	this.enemyBulletPool.setAll('anchor.y', 0.5);
 	this.enemyBulletPool.setAll('outOfBoundsKill', true);
@@ -185,7 +185,7 @@ BasicGame.Game2.prototype = {
 	this.bulletPool = this.add.group();
 	this.bulletPool.enableBody = true;
 	this.bulletPool.physicsBodyType = Phaser.Physics.ARCADE;
-	this.bulletPool.createMultiple(100, 'bullet');
+	this.bulletPool.createMultiple(100, 'bullet2');
 	this.bulletPool.setAll('anchor.x', 0.5);
 	this.bulletPool.setAll('anchor.y', 0.5);
 	this.bulletPool.setAll('outOfBoundsKill', true); //화면 밖으로 나가면 삭제 처리
@@ -215,11 +215,11 @@ BasicGame.Game2.prototype = {
 	this.powerUpSFX = this.add.audio('powerUp');
 
 	//안내문
-	this.instructions = this.add.text(this.game.width / 2, this.game.height - 100, 'Z키나 click으로 발포할 수 있습니다', { font: '20px monospace', fill: '#fff', align: 'center' });
+	this.instructions = this.add.text(this.game.width / 2, this.game.height - 100, 'Z키나 click으로 발포, B키로 폭격기출격', { font: '20px monospace', fill: '#fff', align: 'center' });
 	this.instructions.anchor.setTo(0.5, 0.5);
 	this.instExpire = this.time.now + BasicGame.INSTRUCTION_EXPIRE; //안내문구 10초간 생성
 
-	this.score = 50000;
+	this.score = 100000;
 	this.scoreText = this.add.text(this.game.width / 2, 30, '' + this.score, {font: '30px Arial', fill: '#fff', align: 'center'});
 	this.scoreText.anchor.setTo(0.5, 0.5);
 },
@@ -395,12 +395,12 @@ BasicGame.Game2.prototype = {
 		}
 		for(var i = 0; i < this.weaponLevel; i++) { //무기레벨업
 			bullet = this.bulletPool.getFirstExists(false); 
-			bullet.reset(this.player.x - (10 + i * 8), this.player.y - 20); 
-			//this.physics.arcade.velocityFromAngle(-95 - i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity); //총알 휘어나감
+			bullet.reset(this.player.x - (10 + i * 12), this.player.y - 20); 
+			this.physics.arcade.velocityFromAngle(-95 - i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity); //총알 휘어나감
 			bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;
 			bullet = this.bulletPool.getFirstExists(false); 
-			bullet.reset(this.player.x + (10 + i * 8), this.player.y - 20);
-			//this.physics.arcade.velocityFromAngle(-85 + i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity);
+			bullet.reset(this.player.x + (10 + i * 12), this.player.y - 20);
+			this.physics.arcade.velocityFromAngle(-85 + i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity);
 			bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;
 		}
 	}
@@ -421,7 +421,7 @@ BasicGame.Game2.prototype = {
 
 		var hero = this.heroPool.getFirstExists(false); //영웅을 생성
 		hero.reset(this.player.x, this.player.y - 20);
-		hero.body.velocity.y = -50;
+		hero.body.velocity.y = -100;
 	}
  },
 
@@ -501,7 +501,7 @@ BasicGame.Game2.prototype = {
  addToScore: function (score) {
  	this.score += score;
  	this.scoreText.text = this.score; 224
-	if(this.score >= 150000) {
+	if(this.score >= 300000) {
 		this.enemyPool.destroy();
 		this.shooterPool.destroy();
 		this.enemyBulletPool.destroy();
