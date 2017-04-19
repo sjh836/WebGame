@@ -20,6 +20,7 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.prototype = {
   create: function () {
+  	var clear=false; //1탄 클리어 여부
 	this.sea = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'sea');
  	//this.sea.autoScroll(0, BasicGame.SEA_SCROLL_SPEED); 
 
@@ -508,6 +509,7 @@ BasicGame.Game.prototype = {
 		this.enemyBulletPool.destroy();
 		this.bossPool.destroy();
 		this.destroyerPool.destroy();
+		this.clear=true;
 		this.displayEnd(true);
 	}
  },
@@ -606,7 +608,9 @@ BasicGame.Game.prototype = {
 	this.bossPool.destroy();
 	this.destroyerPool.destroy();
 	this.heroPool.destroy();
-	//this.state.start('MainMenu'); //메인화면으로
-	this.state.start('Game2'); //2탄으로
+	if(this.clear)
+		this.state.start('Game2'); //2탄으로
+	else
+		this.state.start('MainMenu'); //메인화면으로
   }
 };
