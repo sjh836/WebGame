@@ -361,7 +361,7 @@ BasicGame.Game.prototype = {
 		this.player.play('fly'); //고스트 모드 해제
 	}
 	if(this.showReturn && this.time.now > this.showReturn) { //게임끝난후 해당 문구 출력
-		this.returnText = this.add.text( this.game.width / 2, this.game.height / 2 + 20, '준비가 되었으면 Z키 또는 Click하여 Stage 2로 가십시오', { font: '16px sans-serif', fill: '#fff'} );
+		this.returnText = this.add.text( this.game.width / 2, this.game.height / 2 + 20, 'Z키 또는 Click하여 진행하여 주십시오', { font: '16px sans-serif', fill: '#fff'} );
 		this.returnText.anchor.setTo(0.5, 0.5);
 		this.showReturn = false;
 	}

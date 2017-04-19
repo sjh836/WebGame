@@ -65,7 +65,7 @@ BasicGame.Game2.prototype = {
  	this.powerUpPool = this.add.group();
  	this.powerUpPool.enableBody = true;
  	this.powerUpPool.physicsBodyType = Phaser.Physics.ARCADE;
- 	this.powerUpPool.createMultiple(3, 'powerup1');
+ 	this.powerUpPool.createMultiple(3, 'powerup2');
  	this.powerUpPool.setAll('anchor.x', 0.5);
  	this.powerUpPool.setAll('anchor.y', 0.5);
  	this.powerUpPool.setAll('outOfBoundsKill', true);
