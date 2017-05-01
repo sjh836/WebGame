@@ -1,7 +1,7 @@
 # 웹게임 프로그래밍
 
 ## 17-1학기 4B 이정훈
-주소: https://ibetter.kr/~lee2012335054
+주소: http://devljh.com/game/
 
 - 우분투서버에 개발환경 구축
 - [phaser.io 튜토리얼 진행](http://phaser.io/tutorials/making-your-first-phaser-game)
