@@ -24,13 +24,13 @@
 발사체, 적군, 아이템 등을 만들 때 흔히 메모리 누수가 일어난다. 리소스를 효과적으로 통제하는 방법으로 즉석에서 객체를 생성하는 것 보단, group pool을 만들고 재활용하는 것이 좋다. 화면 밖을 벗어나면 outOfBoundsKill을 이용하여 회수하는 것이 좋다.
 
 # 내가 만든 즐겜
-## 점프점프 마리오 : [바로가기](https://ibetter.kr/~lee2012335054/4.html)
+## 점프점프 마리오 : [바로가기](http://devljh.com/game/4.html)
 ![마리오](http://img1.daumcdn.net/thumb/R1920x0/?fname=http%3A%2F%2Fcfile4.uf.tistory.com%2Fimage%2F274AB44958EA12030EE975)
 
-## 벽돌깨기 : [바로가기](https://ibetter.kr/~lee2012335054/5.html)
+## 벽돌깨기 : [바로가기](http://devljh.com/game/5.html)
 ![벽돌깨기](http://img1.daumcdn.net/thumb/R1920x0/?fname=http%3A%2F%2Fcfile8.uf.tistory.com%2Fimage%2F2475A74958EA1202140A68)
 
-## 전투기(air-war) : [바로가기](https://ibetter.kr/~lee2012335054/6.html)
+## 전투기(air-war) : [바로가기](http://devljh.com/game/6.html)
 ![전투기1](http://img1.daumcdn.net/thumb/R1920x0/?fname=http%3A%2F%2Fcfile24.uf.tistory.com%2Fimage%2F242E0D4958EA6C7A199926)
 ![전투기2](http://img1.daumcdn.net/thumb/R1920x0/?fname=http%3A%2F%2Fcfile2.uf.tistory.com%2Fimage%2F271BF64958EA6C7B105AAE)
 ![전투기3](http://img1.daumcdn.net/thumb/R1920x0/?fname=http%3A%2F%2Fcfile22.uf.tistory.com%2Fimage%2F256D504A58F7013B02317B)
